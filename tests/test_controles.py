@@ -83,7 +83,7 @@ class Fiabilite(unittest.TestCase):
 
     def test_reprises_configurees(self):
         a = collecteurs.SESSION.get_adapter("https://exemple.org")
-        self.assertGreaterEqual(a.max_retries.total, 3)
+        self.assertGreaterEqual(a.max_retries.total, 2)
         self.assertIn(429, a.max_retries.status_forcelist)
 
 

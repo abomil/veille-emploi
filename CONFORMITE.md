@@ -7,7 +7,7 @@ La commande `python -m unittest discover -s tests -v` lance les 23 tests automat
 
 | Contrôle | Mise en œuvre | Test |
 |---|---|---|
-| Reprise sur erreur réseau | 4 essais espacés de 2, 4 puis 8 s (erreurs 429 et 5xx), en respectant le délai `Retry-After` demandé par le serveur | `test_reprises_configurees` |
+| Reprise sur erreur réseau | 3 essais espacés de 3 puis 6 s (erreurs 429 et 5xx), en respectant le délai `Retry-After` demandé par le serveur | `test_reprises_configurees` |
 | Coupe-circuit | Un serveur qui renvoie deux refus « trop de requêtes » (429) est laissé tranquille jusqu'au lendemain ; un budget de temps (50 min) borne la collecte ; au plus 60 descriptions par source et par jour, la suite les jours suivants | `test_coupe_circuit_*`, `test_budget_*` |
 | Panne d'une source sans effet sur les autres | Chaque source est isolée ; un échec est journalisé et la collecte continue | journal `donnees/journal.log` |
 | Santé des sources | Une source muette, ou en baisse de plus de 70 % par rapport au passage précédent, est signalée dans l'application (bandeau orange) | `donnees/sante.json` |
