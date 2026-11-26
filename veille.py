@@ -89,6 +89,8 @@ def executer(args) -> None:
     if not args.sans_collecte:
         sources = yaml.safe_load((RACINE / "sources.yaml").read_text(encoding="utf-8"))
         journal("Collecte : début")
+        import os
+        collecteurs.demarrer_chrono(float(os.environ.get("VEILLE_BUDGET_MIN", "50")))
         connus = base.uids_avec_description()
         n, par_source = 0, {}
         for o in collecteurs.tout_collecter(sources, connus, journal):
@@ -103,6 +105,8 @@ def executer(args) -> None:
         base.valider()
         journal(f"Collecte : {n} offres lues, {len(nouveaux)} nouvelles")
         controler_sources(sources, par_source)
+        for h in sorted(collecteurs.SATURES):
+            SANTE.append(f"{h} a demandé de ralentir : reprise au prochain passage")
 
     nouveaux |= base.uids_recents()
     offres = base.offres_actives()

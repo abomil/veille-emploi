@@ -61,6 +61,26 @@ class Fiabilite(unittest.TestCase):
         ev = evaluer({"uid": "x", "titre": "", "description": ""}, profil_test())
         self.assertEqual(ev["score"], 0)
 
+    def test_coupe_circuit_apres_refus_429(self):
+        r = mock.Mock(status_code=429, content=b"")
+        r.raise_for_status.side_effect = collecteurs.requests.HTTPError("429")
+        for _ in range(2):
+            with self.assertRaises(collecteurs.requests.HTTPError):
+                collecteurs._verifier("https://sature.test/jobs", r)
+        self.assertIn("sature.test", collecteurs.SATURES)
+        with self.assertRaises(collecteurs.Refus):
+            collecteurs._get("https://sature.test/jobs")
+        collecteurs.SATURES.discard("sature.test")
+
+    def test_budget_de_temps_respecte(self):
+        ancien = collecteurs.FIN
+        try:
+            collecteurs.demarrer_chrono(-1)
+            with self.assertRaises(collecteurs.Refus):
+                collecteurs._get("https://exemple.org/emplois")
+        finally:
+            collecteurs.FIN = ancien
+
     def test_reprises_configurees(self):
         a = collecteurs.SESSION.get_adapter("https://exemple.org")
         self.assertGreaterEqual(a.max_retries.total, 3)

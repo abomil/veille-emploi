@@ -30,6 +30,15 @@ def texte_brut(h: str | None) -> str:
 
 
 TAILLE_MAX = 15_000_000  # octets : une réponse anormalement grosse est refusée
+DETAILS_MAX = 60         # descriptions lues par source et par passage : le reste est complété les jours suivants
+FIN: float | None = None # heure limite de la collecte (budget de temps)
+SATURES: set[str] = set()  # serveurs qui ont demandé de ralentir : laissés tranquilles jusqu'au prochain passage
+_REFUS_429: dict[str, int] = {}
+
+
+def demarrer_chrono(minutes: float) -> None:
+    global FIN
+    FIN = time.monotonic() + minutes * 60
 
 
 class Refus(Exception):
@@ -42,7 +51,7 @@ def _session() -> requests.Session:
     from requests.adapters import HTTPAdapter
     from urllib3.util.retry import Retry
     s = requests.Session()
-    reprise = Retry(total=4, backoff_factor=2, status_forcelist=(429, 500, 502, 503, 504),
+    reprise = Retry(total=2, backoff_factor=3, status_forcelist=(429, 500, 502, 503, 504),
                     allowed_methods=("GET", "POST"), respect_retry_after_header=True, raise_on_status=False)
     s.mount("https://", HTTPAdapter(max_retries=reprise))
     s.headers.update(ENTETES)
@@ -69,9 +78,29 @@ def autorise(url: str) -> bool:
     return _ROBOTS[hote].can_fetch(ENTETES["User-Agent"], url)
 
 
+def _hote(url: str) -> str:
+    from urllib.parse import urlsplit
+    return urlsplit(url).netloc
+
+
+def _avant(url: str) -> None:
+    """Coupe-circuit : budget de temps écoulé, serveur saturé ou robots.txt défavorable = pas d'appel."""
+    if FIN is not None and time.monotonic() > FIN:
+        raise Refus("budget de temps de la collecte écoulé (reprise au prochain passage)")
+    if _hote(url) in SATURES:
+        raise Refus("serveur saturé, laissé tranquille jusqu'au prochain passage")
+    if not autorise(url):
+        raise Refus(f"robots.txt interdit {url}")
+
+
 def _verifier(url: str, r: requests.Response) -> requests.Response:
     if not url.startswith("https://"):
         raise Refus(f"adresse non chiffrée refusée : {url}")
+    if r.status_code == 429:
+        h = _hote(url)
+        _REFUS_429[h] = _REFUS_429.get(h, 0) + 1
+        if _REFUS_429[h] >= 2:
+            SATURES.add(h)
     r.raise_for_status()
     if len(r.content) > TAILLE_MAX:
         raise ValueError(f"réponse trop volumineuse ({len(r.content)} octets)")
@@ -80,14 +109,12 @@ def _verifier(url: str, r: requests.Response) -> requests.Response:
 
 
 def _get(url: str, **kw):
-    if not autorise(url):
-        raise Refus(f"robots.txt interdit {url}")
+    _avant(url)
     return _verifier(url, SESSION.get(url, timeout=40, **kw))
 
 
 def _post(url: str, payload: dict):
-    if not autorise(url):
-        raise Refus(f"robots.txt interdit {url}")
+    _avant(url)
     return _verifier(url, SESSION.post(url, json=payload, headers={"Content-Type": "application/json"}, timeout=40))
 
 
@@ -134,11 +161,12 @@ def pnud(requetes: list[str], journal: Callable[[str], None], deja_connus: set[s
             continue
         for r in (items[0].get("requisitionList") or []) if items else []:
             vus[r["Id"]] = r
-    offres = []
+    offres, lus = [], 0
     for rid, r in vus.items():
         uid = f"pnud:{rid}"
         desc = ""
-        if uid not in deja_connus:
+        if uid not in deja_connus and lus < DETAILS_MAX:
+            lus += 1
             try:
                 d = _get(PNUD + "recruitingCEJobRequisitionDetails?expand=all&onlyData=true&finder=ById;"
                          f"Id=%22{rid}%22,siteNumber=CX_1").json().get("items") or []
@@ -178,11 +206,12 @@ def workday(cfg: dict, requetes: list[str], journal: Callable[[str], None], deja
                     vus[p["externalPath"]] = p
             if len(lot) < 20:
                 break
-    offres = []
+    offres, lus = [], 0
     for chemin, p in vus.items():
         uid = f"wd:{t}:{chemin.rsplit('_', 1)[-1]}"
         desc, lieu, publiee = "", p.get("locationsText", ""), ""
-        if uid not in deja_connus:
+        if uid not in deja_connus and lus < DETAILS_MAX:
+            lus += 1
             try:
                 info = _get(base + chemin).json().get("jobPostingInfo", {})
                 desc = texte_brut(info.get("jobDescription"))
