@@ -67,6 +67,13 @@ jobs:
           path: donnees
           key: veille-base-${{ github.run_id }}
 
+      - name: Envoi des offres à la plateforme Vigie (ignoré si non configuré)
+        continue-on-error: true   # un incident côté Vigie ne bloque jamais la publication de la veille
+        env:
+          VIGIE_URL: ${{ secrets.VIGIE_URL }}
+          VIGIE_JETON_IMPORT: ${{ secrets.VIGIE_JETON_IMPORT }}
+        run: python -m moteur.vigie
+
       - name: Contrôle avant publication (aucune donnée en clair)
         run: python tests/verifier_publication.py site profils/marcellin.yaml
 
