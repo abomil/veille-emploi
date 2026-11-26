@@ -57,6 +57,7 @@ jobs:
       - name: Collecte, notation et dossiers de candidature
         env:
           VEILLE_PHRASE: ${{ secrets.VEILLE_PHRASE }}
+          VEILLE_SANS_WORKDAY: "1"   # Workday refuse les serveurs de GitHub : ses offres viennent de l'ordinateur (apport/)
         run: python veille.py
 
       - name: Sauvegarde de la base

@@ -14,7 +14,7 @@ if ($Retirer) {
 $python = (Get-Command python).Source
 # veille.py est recherché à chaque lancement : la tâche continue de marcher si le dossier est réorganisé.
 $commande = "`$v = Get-ChildItem -LiteralPath '$Dossier' -Filter veille.py -Recurse -Depth 3 | Select-Object -First 1; " +
-            "if (`$v) { Set-Location `$v.DirectoryName; & '$python' `$v.FullName }"
+            "if (`$v) { Set-Location `$v.DirectoryName; & '$python' `$v.FullName --apport }"
 $action = New-ScheduledTaskAction -Execute "powershell.exe" `
     -Argument "-NoProfile -WindowStyle Hidden -ExecutionPolicy Bypass -Command `"$commande`""
 $declencheur = New-ScheduledTaskTrigger -Daily -At $Heure

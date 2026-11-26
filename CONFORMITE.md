@@ -1,7 +1,7 @@
 # Contrôles de fiabilité, de conformité et de sécurité
 
 Ce document décrit les contrôles intégrés à l'application et la manière de les vérifier soi-même.
-La commande `python -m unittest discover -s tests -v` lance les 23 tests automatiques. Les mêmes tests tournent dans le cloud avant chaque publication : **si un seul échoue, rien n'est publié** et GitHub envoie un courriel d'échec.
+La commande `python -m unittest discover -s tests -v` lance les 25 tests automatiques. Les mêmes tests tournent dans le cloud avant chaque publication : **si un seul échoue, rien n'est publié** et GitHub envoie un courriel d'échec.
 
 ## 1. Fiabilité
 
@@ -15,6 +15,8 @@ La commande `python -m unittest discover -s tests -v` lance les 23 tests automat
 | Aucune perte de données | Enregistrement toutes les 25 offres ; une description vide n'écrase jamais une description connue | `base.enregistrer` |
 | Notation explicable et bornée | Score entre 0 et 100, chaque point justifié ; une offre vide ne bloque rien | `test_score_*`, `test_offre_vide_*` |
 | Dossiers exacts | Chaque réalisation citée vient de votre banque, rien n'est inventé ; les chiffres manquants restent marqués [à chiffrer] | `test_aucune_realisation_inventee` |
+
+| Sources Workday | Workday refuse les serveurs de GitHub (centres de données). Ces offres sont donc lues par l'ordinateur, que Workday accepte, puis déposées dans `apport/offres.json` : offres publiques uniquement, sans aucune donnée de profil (`test_apport_*`). Le cloud les intègre si elles ont moins de 3 jours ; au-delà, une alerte invite à allumer l'ordinateur. Aucun contournement du blocage n'est tenté. |
 
 ## 2. Conformité
 

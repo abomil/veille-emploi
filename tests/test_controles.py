@@ -207,6 +207,28 @@ class Securite(unittest.TestCase):
         self.assertIn("!profils/exemple.yaml", gi)
 
 
+class Apport(unittest.TestCase):
+    """Offres Workday déposées par l'ordinateur : publiques, sans donnée de profil, ignorées si trop anciennes."""
+
+    def test_apport_sans_donnee_de_profil(self):
+        import veille
+        self.assertFalse(set(veille.CHAMPS_OFFRE) & {"score", "detail", "points_forts", "ecarts_ats", "statut",
+                                                     "note", "dossier_md", "analyse"})
+
+    def test_apport_trop_ancien_ignore(self):
+        import veille
+        with tempfile.TemporaryDirectory() as d:
+            f = Path(d) / "offres.json"
+            f.write_text(json.dumps({"horodatage": "2020-01-01T00:00:00", "offres": [OFFRE]}), encoding="utf-8")
+            base = mock.Mock()
+            with mock.patch.object(veille, "APPORT", f):
+                veille.SANTE.clear()
+                veille.importer_apport(base, set())
+            base.enregistrer.assert_not_called()
+            self.assertTrue(any("jours" in a for a in veille.SANTE))
+            veille.SANTE.clear()
+
+
 class QualiteDossiers(unittest.TestCase):
     def test_dossier_complet_et_exact(self):
         p = profil_test()

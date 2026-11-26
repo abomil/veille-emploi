@@ -10,6 +10,7 @@ Utilisation :
 from __future__ import annotations
 
 import argparse
+import os
 import sys
 from datetime import datetime
 from pathlib import Path
@@ -73,6 +74,57 @@ def controler_sources(sources: dict, par_source: dict[str, int]) -> None:
     fichier.write_text(json.dumps({**avant, **par_source}, ensure_ascii=False, indent=1), encoding="utf-8")
 
 
+APPORT = RACINE / "apport" / "offres.json"
+CHAMPS_OFFRE = ("uid", "source", "organisation", "titre", "lieu", "url", "publiee", "limite", "description", "contrat")
+
+
+def exporter_apport(base: Base) -> None:
+    """Ordinateur : dépose les offres Workday (publiques, sans aucune donnée de profil) pour le passage cloud."""
+    import json
+    import subprocess
+    offres = [{k: (o.get(k) or "")[:8000] for k in CHAMPS_OFFRE}
+              for o in base.offres_actives(2) if o["source"].endswith("(Workday)")]
+    if not offres:
+        journal("Apport : aucune offre Workday à déposer")
+        return
+    APPORT.parent.mkdir(exist_ok=True)
+    APPORT.write_text(json.dumps({"horodatage": datetime.now().isoformat(timespec="seconds"),
+                                  "offres": sorted(offres, key=lambda o: o["uid"])},
+                                 ensure_ascii=False, indent=0), encoding="utf-8")
+    try:
+        git = lambda *a: subprocess.run(["git", *a], cwd=RACINE, check=True, capture_output=True, text=True)
+        git("add", "apport/offres.json")
+        if subprocess.run(["git", "diff", "--cached", "--quiet"], cwd=RACINE).returncode:
+            git("commit", "-m", f"Apport Workday : {len(offres)} offres publiques")
+            git("pull", "--rebase", "--autostash", "--quiet")
+            git("push", "--quiet")
+        journal(f"Apport : {len(offres)} offres Workday déposées pour le passage cloud")
+    except (OSError, subprocess.CalledProcessError) as e:
+        journal(f"Apport : dépôt impossible ({e}) ; le cloud utilisera le dernier apport")
+
+
+def importer_apport(base: Base, nouveaux: set[str]) -> None:
+    """Cloud : intègre les offres Workday déposées par l'ordinateur (si elles ont moins de 3 jours)."""
+    import json
+    try:
+        a = json.loads(APPORT.read_text(encoding="utf-8"))
+        age = (datetime.now() - datetime.fromisoformat(a["horodatage"])).days
+    except (OSError, ValueError, KeyError):
+        SANTE.append("Sources Workday : aucun apport de l'ordinateur pour l'instant")
+        return
+    if age > 3:
+        SANTE.append(f"Sources Workday : dernier apport de l'ordinateur il y a {age} jours (l'allumer pour les actualiser)")
+        return
+    n = 0
+    for o in a["offres"]:
+        if valide(o):
+            n += 1
+            if base.enregistrer(o):
+                nouveaux.add(o["uid"])
+    base.valider()
+    journal(f"Apport de l'ordinateur intégré : {n} offres Workday (âge : {age} j)")
+
+
 def charger_profils(nom: str | None) -> list[dict]:
     fichiers = [f for f in sorted((RACINE / "profils").glob("*.yaml")) if f.stem != "exemple"]
     profils = [yaml.safe_load(f.read_text(encoding="utf-8")) for f in fichiers]
@@ -89,7 +141,9 @@ def executer(args) -> None:
     if not args.sans_collecte:
         sources = yaml.safe_load((RACINE / "sources.yaml").read_text(encoding="utf-8"))
         journal("Collecte : début")
-        import os
+        if os.environ.get("VEILLE_SANS_WORKDAY"):  # cloud : Workday refuse les centres de données
+            sources["workday"] = []
+            importer_apport(base, nouveaux)
         collecteurs.demarrer_chrono(float(os.environ.get("VEILLE_BUDGET_MIN", "50")))
         connus = base.uids_avec_description()
         n, par_source = 0, {}
@@ -107,6 +161,8 @@ def executer(args) -> None:
         controler_sources(sources, par_source)
         for h in sorted(collecteurs.SATURES):
             SANTE.append(f"{h} a demandé de ralentir : reprise au prochain passage")
+        if getattr(args, "apport", False):
+            exporter_apport(base)
 
     nouveaux |= base.uids_recents()
     offres = base.offres_actives()
@@ -164,6 +220,7 @@ def main() -> None:
     ap = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
     ap.add_argument("--profil")
     ap.add_argument("--sans-collecte", action="store_true")
+    ap.add_argument("--apport", action="store_true", help="déposer les offres Workday pour le passage cloud")
     executer(ap.parse_args())
 
 
