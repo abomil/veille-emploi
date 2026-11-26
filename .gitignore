@@ -1,0 +1,14 @@
+# Données personnelles : jamais versionnées (le profil réel est fourni par un secret GitHub)
+profils/*.yaml
+!profils/exemple.yaml
+donnees/
+rapports/
+site/
+__pycache__/
+*.pyc
+.env
+.claude/
+
+# Guides personnalisés (contiennent votre parcours) : gardés sur votre ordinateur
+GUIDE-CANDIDATURE.md
+GUIDE-STRATEGIE.md

@@ -1,0 +1,274 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'unsafe-inline' 'self'; style-src 'unsafe-inline'; img-src 'self' data:; connect-src 'self'; base-uri 'none'; form-action 'none'; object-src 'none'">
+<meta name="referrer" content="no-referrer">
+<meta name="robots" content="noindex, nofollow">
+<meta name="theme-color" content="#0f6b57">
+<title>Veille emploi santé</title>
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="icon" href="icone-192.png">
+<link rel="apple-touch-icon" href="icone-192.png">
+<style>
+:root{--fond:#f6f7f5;--carte:#fff;--texte:#1d2420;--doux:#5c665f;--trait:#dde2dd;--accent:#0f6b57;--accent-doux:#e3f1ec;--alerte:#9a5b00;--alerte-doux:#fbf0dc;--bas:#8a8f8b}
+@media (prefers-color-scheme:dark){:root{--fond:#121614;--carte:#1b201d;--texte:#e7ece8;--doux:#9ba59e;--trait:#2c332f;--accent:#4fc3a1;--accent-doux:#173129;--alerte:#e9b25a;--alerte-doux:#3a2c14;--bas:#6c736e}}
+*{box-sizing:border-box}
+body{margin:0;background:var(--fond);color:var(--texte);font:15px/1.5 "Segoe UI",system-ui,sans-serif}
+header{padding:28px 16px 12px;max-width:1100px;margin:auto}
+h1{font-size:24px;margin:0 0 4px}
+.sous{color:var(--doux);margin:0}
+.kpis{display:flex;gap:12px;flex-wrap:wrap;margin:18px 0 6px}
+.kpi{background:var(--carte);border:1px solid var(--trait);border-radius:10px;padding:10px 14px;min-width:120px;flex:1 1 120px}
+.kpi b{display:block;font-size:22px}
+.kpi span{color:var(--doux);font-size:13px}
+.sante{font-size:13px;color:var(--alerte);margin:6px 0 0}
+.filtres{position:sticky;top:0;z-index:2;background:var(--fond);border-bottom:1px solid var(--trait)}
+.filtres div{max-width:1100px;margin:auto;padding:10px 16px;display:flex;gap:10px;flex-wrap:wrap;align-items:center}
+input[type=search],input[type=password],select{padding:7px 10px;border:1px solid var(--trait);border-radius:8px;background:var(--carte);color:var(--texte);font:inherit}
+input[type=search]{flex:1 1 220px;min-width:0}
+label{font-size:14px;color:var(--doux);display:flex;gap:5px;align-items:center;cursor:pointer}
+main{max-width:1100px;margin:auto;padding:12px 16px 60px}
+.offre{background:var(--carte);border:1px solid var(--trait);border-radius:12px;padding:14px 16px;margin:10px 0;display:grid;grid-template-columns:64px 1fr;gap:14px}
+.score{width:56px;height:56px;border-radius:50%;display:grid;place-items:center;font-weight:700;font-size:18px;background:var(--accent-doux);color:var(--accent)}
+.score.prio{background:var(--accent);color:var(--carte)}
+.score.bas{background:var(--trait);color:var(--bas)}
+.offre h2{font-size:16px;margin:0 0 2px;overflow-wrap:anywhere}
+.offre h2 a{color:inherit;text-decoration:none}
+.offre h2 a:hover{text-decoration:underline}
+.meta{color:var(--doux);font-size:13.5px;overflow-wrap:anywhere}
+.tags{margin:8px 0 4px;display:flex;flex-wrap:wrap;gap:6px}
+.tag{font-size:12px;padding:2px 8px;border-radius:99px;background:var(--fond);border:1px solid var(--trait)}
+.tag.ok{background:var(--accent-doux);border-color:transparent;color:var(--accent)}
+.tag.neuf{background:var(--alerte-doux);border-color:transparent;color:var(--alerte);font-weight:600}
+button{font:inherit;cursor:pointer}
+.dossier{margin:4px 0;font-size:13.5px;font-weight:600;color:var(--accent);background:none;border:1px solid var(--accent);border-radius:8px;padding:3px 10px}
+.dossier:hover{background:var(--accent-doux)}
+details{margin-top:6px;font-size:14px}
+summary{cursor:pointer;color:var(--accent)}
+.bloc{margin:6px 0;overflow-wrap:anywhere}
+.bloc b{font-weight:600}
+.extrait{color:var(--doux);white-space:pre-line;font-size:13px;max-height:9em;overflow:auto;border-left:3px solid var(--trait);padding-left:10px}
+.suivi{float:right;font-size:13px}
+.vide{color:var(--doux);text-align:center;padding:40px}
+dialog{border:none;border-radius:14px;padding:0;width:min(860px,96vw);max-height:92vh;background:var(--carte);color:var(--texte)}
+dialog::backdrop{background:rgba(0,0,0,.45)}
+.dlg-tete{position:sticky;top:0;background:var(--carte);border-bottom:1px solid var(--trait);padding:10px 16px;display:flex;justify-content:space-between;gap:10px;align-items:center}
+.dlg-corps{padding:4px 18px 24px;line-height:1.6}
+.dlg-corps h1{font-size:19px}.dlg-corps h2{font-size:16.5px;color:var(--accent);margin-top:26px;border-bottom:1px solid var(--trait);padding-bottom:3px}
+.dlg-corps blockquote{background:var(--fond);border-left:4px solid var(--accent);margin:10px 0;padding:8px 12px;border-radius:6px}
+.dlg-corps pre{background:var(--fond);border:1px solid var(--trait);border-radius:8px;padding:12px;white-space:pre-wrap;font:14px/1.55 Georgia,serif}
+.dlg-corps a{color:var(--accent)}
+.outils button{border:1px solid var(--trait);background:var(--fond);color:var(--texte);border-radius:8px;padding:4px 10px;font-size:13px}
+#verrou{max-width:420px;margin:12vh auto;padding:24px 18px;background:var(--carte);border:1px solid var(--trait);border-radius:14px}
+#verrou input[type=password]{width:100%;margin:10px 0}
+#verrou .principal{background:var(--accent);color:var(--carte);border:none;border-radius:8px;padding:8px 16px;font-weight:600}
+.erreur{color:#b3261e;font-size:14px;min-height:1.2em}
+footer{max-width:1100px;margin:auto;padding:0 16px 30px;color:var(--doux);font-size:12.5px}
+[hidden]{display:none!important}
+@media (max-width:600px){.offre{grid-template-columns:1fr}.suivi{float:none;display:block;margin:6px 0}}
+@media print{.filtres,header,main,footer{display:none}dialog{position:static;width:100%;max-height:none;box-shadow:none}.dlg-tete{display:none}}
+</style>
+</head>
+<body>
+<form id="verrou" hidden>
+  <h1>Veille emploi</h1>
+  <p class="sous">Les données sont chiffrées. Entrez votre phrase secrète.</p>
+  <input type="password" id="phrase" autocomplete="current-password" aria-label="Phrase secrète" required>
+  <label><input type="checkbox" id="retenir" checked> Se souvenir sur cet appareil</label>
+  <p class="erreur" id="err"></p>
+  <button class="principal" type="submit">Ouvrir</button>
+</form>
+<div id="appli" hidden>
+<header>
+  <h1 id="titre">Veille emploi</h1>
+  <p class="sous" id="sous"></p>
+  <p class="sante" id="sante" hidden></p>
+  <div class="kpis" id="kpis"></div>
+</header>
+<div class="filtres"><div>
+  <input type="search" id="q" placeholder="Rechercher : intitulé, organisation, pays, mot-clé…">
+  <select id="min" aria-label="Score minimal"><option value="0">Tous les scores</option><option value="45">Score ≥ 45</option><option value="60" selected>Score ≥ 60</option><option value="75">Score ≥ 75</option></select>
+  <select id="tri" aria-label="Tri"><option value="score">Tri : score</option><option value="limite">Tri : date limite</option><option value="neuf">Tri : nouveautés d'abord</option></select>
+  <label><input type="checkbox" id="fr"> Français</label>
+  <label><input type="checkbox" id="tt"> Télétravail</label>
+  <label><input type="checkbox" id="co"> Consultance</label>
+  <label><input type="checkbox" id="nv"> Nouvelles</label>
+  <label><input type="checkbox" id="ec"> Masquer écartées</label>
+</div></div>
+<main id="liste"></main>
+<footer id="pied"></footer>
+</div>
+<dialog id="dlg" aria-label="Dossier de candidature">
+  <div class="dlg-tete"><b>Dossier de candidature</b>
+    <span class="outils"><button type="button" id="copier">Copier le texte</button> <button type="button" id="imprimer">Imprimer</button> <button type="button" id="fermer">Fermer</button></span></div>
+  <div class="dlg-corps" id="dlg-corps"></div>
+</dialog>
+<script>
+"use strict";
+let D = /*__DONNEES__*/null;
+const $ = s => document.querySelector(s);
+const esc = s => String(s ?? "").replace(/[&<>"']/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
+const urlSure = u => /^https:\/\//i.test(u || "") ? u : "#";   // seuls les liens https sont suivis
+const lire = (k, d) => { try { return JSON.parse(localStorage.getItem(k)) ?? d; } catch (e) { return d; } };
+const ecrire = (k, v) => { try { localStorage.setItem(k, JSON.stringify(v)); } catch (e) {} };
+const STATUTS = {nouveau:"Nouveau",a_etudier:"À étudier",a_postuler:"À postuler",candidature_envoyee:"Candidature envoyée",entretien:"Entretien",ecarte:"Écarté"};
+let suiviLocal = {}, cleSuivi = "veille-suivi";
+
+// ── Déchiffrement (AES-256-GCM, clé dérivée par PBKDF2-SHA-256) ─────────────────────────────
+const b64 = s => Uint8Array.from(atob(s), c => c.charCodeAt(0));
+const versB64 = a => btoa(String.fromCharCode(...new Uint8Array(a)));
+async function deriver(phrase, sel, iter) {
+  const base = await crypto.subtle.importKey("raw", new TextEncoder().encode(phrase), "PBKDF2", false, ["deriveKey"]);
+  return crypto.subtle.deriveKey({name: "PBKDF2", salt: sel, iterations: iter, hash: "SHA-256"}, base,
+    {name: "AES-GCM", length: 256}, true, ["decrypt"]);
+}
+async function ouvrir(j, cle) {
+  const clair = await crypto.subtle.decrypt({name: "AES-GCM", iv: b64(j.iv)}, cle, b64(j.donnees));
+  return JSON.parse(new TextDecoder().decode(clair));
+}
+function deverrouiller(j) {
+  const memo = "veille-cle-" + j.sel;
+  return new Promise(async resolve => {
+    const cleMemo = lire(memo, null);
+    if (cleMemo) {
+      try {
+        const k = await crypto.subtle.importKey("raw", b64(cleMemo), "AES-GCM", false, ["decrypt"]);
+        return resolve(await ouvrir(j, k));
+      } catch (e) { try { localStorage.removeItem(memo); } catch (e2) {} }
+    }
+    $("#verrou").hidden = false; $("#phrase").focus();
+    $("#verrou").onsubmit = async ev => {
+      ev.preventDefault(); $("#err").textContent = "Vérification…";
+      try {
+        const k = await deriver($("#phrase").value, b64(j.sel), j.iter);
+        const d = await ouvrir(j, k);
+        if ($("#retenir").checked) ecrire(memo, versB64(await crypto.subtle.exportKey("raw", k)));
+        $("#phrase").value = ""; $("#verrou").hidden = true; resolve(d);
+      } catch (e) { $("#err").textContent = "Phrase secrète incorrecte."; }
+    };
+  });
+}
+
+// ── Mini-rendu Markdown (le texte est échappé avant toute mise en forme) ──────────────────
+function enLigne(t) {
+  return esc(t).replace(/\*\*(.+?)\*\*/g, "<b>$1</b>").replace(/\*(.+?)\*/g, "<i>$1</i>")
+    .replace(/`(.+?)`/g, "<code>$1</code>")
+    .replace(/\[(.+?)\]\((https:\/\/[^)\s]+)\)/g, '<a href="$2" target="_blank" rel="noopener noreferrer">$1</a>');
+}
+function markdown(md) {
+  const out = []; let liste = false, code = false;
+  for (const l of md.split("\n")) {
+    if (l.startsWith("```")) { out.push(code ? "</pre>" : "<pre>"); code = !code; continue; }
+    if (code) { out.push(esc(l)); continue; }
+    if (liste && !l.startsWith("- ") && !l.startsWith("  ")) { out.push("</ul>"); liste = false; }
+    if (l.startsWith("# ")) out.push(`<h1>${enLigne(l.slice(2))}</h1>`);
+    else if (l.startsWith("## ")) out.push(`<h2>${enLigne(l.slice(3))}</h2>`);
+    else if (l.startsWith("> ")) out.push(`<blockquote>${enLigne(l.slice(2))}</blockquote>`);
+    else if (l.startsWith("- ")) { if (!liste) { out.push("<ul>"); liste = true; } out.push(`<li>${enLigne(l.slice(2).replace("[ ] ", "☐ "))}`); }
+    else if (l.startsWith("  ") && liste) out.push(`<br><span class="sous">${enLigne(l.trim())}</span>`);
+    else if (l.trim()) out.push(`<p>${enLigne(l)}</p>`);
+  }
+  if (liste) out.push("</ul>");
+  return out.join("\n");
+}
+
+// ── Application ─────────────────────────────────────────────────────────────────────────
+const statutDe = o => suiviLocal[o.uid] || o.statut || "nouveau";
+function kpis() {
+  const o = D.offres, n = f => o.filter(f).length;
+  $("#kpis").innerHTML = [
+    [o.length, "offres retenues"], [n(x => x.score >= D.seuil_alerte), "prioritaires"],
+    [n(x => x.nouveau), "nouvelles"], [n(x => x.francais), "en français"],
+    [n(x => x.teletravail), "télétravail"], [n(x => ["a_postuler","candidature_envoyee","entretien"].includes(statutDe(x))), "en cours"]
+  ].map(([v, l]) => `<div class="kpi"><b>${v}</b><span>${l}</span></div>`).join("");
+}
+function rendre() {
+  const q = $("#q").value.toLowerCase(), min = +$("#min").value;
+  const l = D.offres.filter(o => o.score >= min
+    && (!$("#fr").checked || o.francais) && (!$("#tt").checked || o.teletravail)
+    && (!$("#co").checked || o.consultance) && (!$("#nv").checked || o.nouveau)
+    && (!$("#ec").checked || statutDe(o) !== "ecarte")
+    && (!q || [o.titre, o.organisation, o.lieu, o.extrait, (o.points_forts || []).join(" ")].join(" ").toLowerCase().includes(q)));
+  const t = $("#tri").value;
+  l.sort((a, b) => t === "limite" ? (a.limite || "9999").localeCompare(b.limite || "9999")
+    : t === "neuf" ? (b.nouveau - a.nouveau) || (b.score - a.score) : b.score - a.score);
+  if (!l.length) { $("#liste").innerHTML = '<p class="vide">Aucune offre ne correspond à ces filtres.</p>'; return; }
+  $("#liste").innerHTML = l.map(o => {
+    const cls = o.score >= D.seuil_alerte ? "prio" : o.score < 45 ? "bas" : "";
+    const tags = [
+      o.nouveau && '<span class="tag neuf">Nouvelle</span>',
+      o.francais_niveau && `<span class="tag ${o.francais ? "ok" : ""}">${esc(o.francais_niveau[0].toUpperCase() + o.francais_niveau.slice(1))}</span>`,
+      o.francophone && '<span class="tag ok">Pays francophone</span>',
+      o.teletravail && '<span class="tag ok">Télétravail</span>',
+      o.consultance && '<span class="tag ok">Consultance</span>',
+      o.anglais_exige && '<span class="tag">Anglais exigé</span>',
+      o.grade && `<span class="tag">Grade ${esc(o.grade)}</span>`,
+      `<span class="tag">Rémunération ${esc(o.remuneration)}</span>`,
+      o.limite && `<span class="tag">Limite ${esc(o.limite)}</span>`
+    ].filter(Boolean).join("");
+    const opts = Object.entries(STATUTS).map(([k, v]) => `<option value="${k}" ${statutDe(o) === k ? "selected" : ""}>${v}</option>`).join("");
+    return `<article class="offre">
+      <div class="score ${cls}" title="Score d'adéquation sur 100">${+o.score}</div>
+      <div>
+        <select class="suivi" data-uid="${esc(o.uid)}" aria-label="Suivi">${opts}</select>
+        <h2><a href="${esc(urlSure(o.url))}" target="_blank" rel="noopener noreferrer">${esc(o.titre)}</a></h2>
+        <div class="meta">${esc(o.organisation)} · ${esc(o.lieu || "lieu non précisé")} · ${esc(o.source)}</div>
+        <div class="tags">${tags}</div>
+        ${o.dossier_md ? `<button type="button" class="dossier" data-uid="${esc(o.uid)}">Préparer ma candidature →</button>` : ""}
+        <details><summary>Analyse ATS et extrait</summary>
+          <div class="bloc"><b>Calcul du score :</b> ${esc((o.detail || []).join(" · "))}</div>
+          <div class="bloc"><b>Vos termes déjà présents dans le CV :</b> ${esc((o.points_forts || []).join(", ") || "aucun")}</div>
+          <div class="bloc"><b>Termes de l'offre absents de votre CV</b> (à reprendre mot pour mot si vous les maîtrisez) : ${esc((o.ecarts_ats || []).join(", ") || "aucun")}</div>
+          <div class="extrait">${esc(o.extrait || "Description non disponible : ouvrir l'offre.")}</div>
+        </details>
+      </div></article>`;
+  }).join("");
+}
+function ouvrirDossier(uid) {
+  const o = D.offres.find(x => x.uid === uid);
+  if (!o) return;
+  $("#dlg-corps").innerHTML = markdown(o.dossier_md);
+  $("#dlg").dataset.md = o.dossier_md;
+  $("#dlg").showModal();
+}
+async function demarrer() {
+  try {
+    if (!D) {
+      const r = await fetch("donnees.json", {cache: "no-store"});
+      if (!r.ok) throw new Error("HTTP " + r.status);
+      const j = await r.json();
+      D = j.chiffre ? await deverrouiller(j) : j;
+    }
+  } catch (e) {
+    document.body.innerHTML = '<p class="vide">Données indisponibles (hors ligne et jamais ouvertes sur cet appareil ?).</p>';
+    return;
+  }
+  cleSuivi = "veille-suivi-" + (D.identifiant || "");
+  suiviLocal = Object.assign(lire("veille-suivi", {}), lire(cleSuivi, {}));
+  $("#appli").hidden = false;
+  $("#titre").textContent = "Veille emploi — " + D.profil;
+  $("#sous").textContent = D.cible + " · mise à jour le " + D.horodatage;
+  if (D.sante && D.sante.length) { $("#sante").hidden = false; $("#sante").textContent = "Sources à vérifier : " + D.sante.join(" · "); }
+  $("#pied").textContent = "Aucune candidature n'est envoyée automatiquement. Vos statuts de suivi restent sur cet appareil.";
+  ["#q", "#min", "#tri", "#fr", "#tt", "#co", "#nv", "#ec"].forEach(s => $(s).addEventListener("input", rendre));
+  $("#liste").addEventListener("change", e => {
+    if (!e.target.classList.contains("suivi")) return;
+    suiviLocal[e.target.dataset.uid] = e.target.value; ecrire(cleSuivi, suiviLocal); kpis();
+  });
+  $("#liste").addEventListener("click", e => { if (e.target.classList.contains("dossier")) ouvrirDossier(e.target.dataset.uid); });
+  $("#fermer").onclick = () => $("#dlg").close();
+  $("#imprimer").onclick = () => window.print();
+  $("#copier").onclick = async () => {
+    try { await navigator.clipboard.writeText($("#dlg").dataset.md); $("#copier").textContent = "Copié ✓"; }
+    catch (e) { $("#copier").textContent = "Copie impossible"; }
+    setTimeout(() => $("#copier").textContent = "Copier le texte", 1800);
+  };
+  kpis(); rendre();
+}
+if ("serviceWorker" in navigator && location.protocol === "https:") navigator.serviceWorker.register("sw.js").catch(() => {});
+demarrer();
+</script>
+</body>
+</html>

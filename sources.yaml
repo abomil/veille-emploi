@@ -1,0 +1,45 @@
+# Sources interrogées automatiquement.
+# Toutes sont des points d'accès PUBLICS que les sites eux-mêmes servent à leurs pages carrières
+# (aucune connexion, aucun contournement). Vérifiées le 25 novembre 2026.
+#
+# Ajouter une organisation sur Workday : ouvrir sa page carrières, l'adresse a la forme
+#   https://<tenant>.<wdN>.myworkdayjobs.com/<site>   → renseigner tenant, serveur (wdN), site.
+
+requetes:   # mots-clés envoyés aux moteurs de recherche des portails
+  - supply chain
+  - procurement
+  - logistics
+  - data
+  - monitoring evaluation
+  - information system
+  - health products
+  - pharmaceutical
+  - approvisionnement
+  - logistique
+  - suivi évaluation
+  - données
+
+nations_unies:
+  actif: true            # careers.un.org : Secrétariat, commissions régionales, consultances
+pnud:
+  actif: true            # PNUD (Oracle Recruiting, site CX_1)
+
+workday:
+  - {nom: "Fonds mondial",            tenant: theglobalfund, serveur: wd1,   site: External}
+  - {nom: "PAM / WFP",                tenant: wfp,           serveur: wd3,   site: job_openings}
+  - {nom: "HCR / UNHCR",              tenant: unhcr,         serveur: wd3,   site: External}
+  - {nom: "PATH",                     tenant: path,          serveur: wd1,   site: External}
+  - {nom: "FHI 360",                  tenant: fhi,           serveur: wd1,   site: FHI_360_External_Career_Portal}
+  - {nom: "MSH",                      tenant: msh,           serveur: wd503, site: External}
+  - {nom: "IRC",                      tenant: theirc,        serveur: wd1,   site: External_Careers}
+  - {nom: "World Vision",             tenant: worldvision,   serveur: wd1,   site: WorldVisionInternational}
+
+# ReliefWeb (des milliers d'offres humanitaires, filtre langue française natif).
+# Exige un « appname » approuvé, gratuit : https://apidoc.reliefweb.int/ — à demander, puis le coller ici.
+reliefweb:
+  actif: false
+  appname: ""
+
+# Flux RSS supplémentaires (sites d'emploi, alertes Google, alertes de plateformes qui offrent un flux).
+rss: []
+#  - {nom: "Exemple", url: "https://exemple.org/emplois/feed"}

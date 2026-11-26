@@ -1,0 +1,287 @@
+# Profil d'EXEMPLE : copier sous profils/<prenom>.yaml et remplacer chaque champ.
+# Les profils réels ne sont jamais versionnés (voir .gitignore).
+identifiant: exemple
+nom: Prénom NOM
+titre_cible: Supply chain santé · Data management · Suivi-évaluation et aide à la décision
+cv_texte: 'Responsable supply chain santé (depuis 2018) : quantification, gestion des stocks, tableaux de bord,
+  qualité des données.
+
+  Formation : master en logistique. Compétences : supply chain, data management, suivi-évaluation.'
+cv_texte_en: 'Health supply chain manager (since 2018): quantification, inventory management, dashboards, data quality.'
+familles:
+  supply_sante:
+    libelle: Supply chain des produits de santé
+    poids: 30
+    termes:
+    - supply chain
+    - chaine d'approvisionnement
+    - chaine logistique
+    - approvisionnement
+    - health products
+    - produits de sante
+    - health commodities
+    - intrants
+    - medicines
+    - medicaments
+    - pharmaceutical
+    - pharmaceutique
+    - psm
+    - procurement and supply
+    - quantification
+    - forecasting
+    - prevision
+    - supply planning
+    - plan d'approvisionnement
+    - inventory
+    - stock
+    - warehouse
+    - entrepot
+    - entreposage
+    - distribution
+    - last mile
+    - dernier kilometre
+    - lmis
+    - elmis
+    - sigl
+    - logistics
+    - logistique
+    - cold chain
+    - chaine du froid
+    - central medical store
+    - centrale d'achat
+    - pharmacie de la sante publique
+    - commodity security
+    - securisation des produits
+  data_decision:
+    libelle: Data management et aide à la décision
+    poids: 30
+    termes:
+    - data management
+    - gestion des donnees
+    - data quality
+    - qualite des donnees
+    - dhis2
+    - dashboard
+    - tableau de bord
+    - power bi
+    - business intelligence
+    - analytics
+    - data analysis
+    - analyse de donnees
+    - statistics
+    - statistique
+    - statisticien
+    - database
+    - base de donnees
+    - information system
+    - systeme d'information
+    - hmis
+    - sigs
+    - data visualization
+    - visualisation
+    - decision-making
+    - decision making
+    - prise de decision
+    - evidence-based
+    - data use
+    - utilisation des donnees
+    - digital health
+    - sante numerique
+    - interoperability
+    - kpi
+    - indicateurs
+  suivi_evaluation:
+    libelle: Suivi-évaluation, MEAL, performance
+    poids: 20
+    termes:
+    - monitoring and evaluation
+    - m&e
+    - suivi-evaluation
+    - suivi et evaluation
+    - meal
+    - mel
+    - merl
+    - performance management
+    - gestion de la performance
+    - pilotage
+    - evaluation
+    - learning
+    - redevabilite
+    - accountability
+    - results framework
+    - cadre de resultats
+    - survey
+    - enquete
+    - end-use verification
+    - audit
+    - assurance qualite
+  achats_projet:
+    libelle: Achats, projet, assistance technique
+    poids: 15
+    termes:
+    - procurement
+    - achats
+    - sourcing
+    - tender
+    - appel d'offres
+    - supplier
+    - fournisseur
+    - contract management
+    - project management
+    - gestion de projet
+    - prince2
+    - capacity building
+    - renforcement des capacites
+    - technical assistance
+    - assistance technique
+    - change management
+    - conduite du changement
+    - s&op
+    - lean
+  sante_mondiale:
+    libelle: Santé mondiale et humanitaire
+    poids: 5
+    termes:
+    - global health
+    - sante mondiale
+    - public health
+    - sante publique
+    - global fund
+    - fonds mondial
+    - gavi
+    - pepfar
+    - usaid
+    - unicef
+    - world health organization
+    - oms
+    - malaria
+    - paludisme
+    - hiv
+    - vih
+    - tuberculosis
+    - tuberculose
+    - vaccine
+    - vaccin
+    - humanitarian
+    - humanitaire
+    - emergency
+    - urgence
+    - ministry of health
+    - ministere de la sante
+seniorite_plus:
+- senior
+- lead
+- head
+- chief
+- chef
+- director
+- directeur
+- directrice
+- manager
+- coordinator
+- coordinateur
+- coordonnateur
+- advisor
+- adviser
+- conseiller
+- expert
+- specialist
+- specialiste
+- consultant
+- team leader
+- principal
+- responsable
+- p-3
+- p-4
+- p-5
+- p3
+- p4
+- p5
+- d-1
+- noc
+- nod
+- gl e
+- gl f
+- gl g
+seniorite_moins:
+- assistant
+- associate
+- intern
+- internship
+- stage
+- stagiaire
+- volunteer
+- volontaire
+- junior
+- trainee
+- g-3
+- g-4
+- g-5
+- g-6
+- g3
+- g4
+- g5
+- g6
+- driver
+- chauffeur
+- clerk
+exclusions:
+- fundraising
+- major giving
+- donor relations
+- nurse
+- infirmier
+- clinical officer
+- medical doctor
+- medecin
+- surgeon
+- security officer
+- legal
+- juriste
+- software engineer
+- developer
+- accountant
+- comptable
+- protection
+- teacher
+- enseignant
+- education
+- finance
+- budgeting
+- human resources
+- ressources humaines
+- engagement communautaire
+- communications
+langue:
+  francais_obligatoire_bonus: 15
+  pays_francophone_bonus: 8
+  anglais_courant_exige_malus: 10
+modalites_bonus:
+  remote: 10
+  consultance: 6
+seuil_affichage: 35
+seuil_alerte: 60
+annees_experience: 10
+diplome: master
+signature: Prénom NOM
+marque:
+  promesse_fr: 'Votre promesse en une phrase : ce que vous rendez possible, pour qui.'
+  promesse_en: Your one-sentence promise.
+  titre_linkedin_fr: Votre titre LinkedIn | domaines | années
+  titre_linkedin_en: Your LinkedIn headline
+  contexte_fr: dans [type d'organisation, pays, bailleurs]
+  contexte_en: in [organisation type, country, donors]
+  ancrage_fr: depuis [pays], au sein de [organisation]
+  ancrage_en: from [country], within [organisation]
+  formation_fr: '[Votre formation et ce qu''elle vous apporte.]'
+  formation_en: '[Your education and what it brings.]'
+  master_fr: '[indiquez quel diplôme y répond].'
+realisations:
+- id: exemple
+  tags:
+  - stock
+  - quantification
+  - dashboard
+  competence: Planning and organizing
+  fr: 'Décrire ici une réalisation : verbe d''action + objet + résultat chiffré [à chiffrer].'
+  en: 'Describe an achievement here: action verb + object + measurable result [figure].'

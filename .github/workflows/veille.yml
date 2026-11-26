@@ -1,0 +1,77 @@
+# Veille quotidienne autonome : tourne sur les serveurs de GitHub, ordinateur éteint.
+# Chaque matin : tests de contrôle → collecte → notation → dossiers → chiffrement → publication.
+# Si un contrôle échoue, rien n'est publié et GitHub envoie un courriel d'échec.
+name: Veille quotidienne
+
+on:
+  schedule:
+    - cron: "0 6 * * *"     # 6 h UTC = 6 h à Abidjan
+  workflow_dispatch: {}       # bouton « Run workflow » pour une mise à jour immédiate
+
+permissions:
+  contents: read              # le code n'est jamais modifié par l'automate
+  pages: write
+  id-token: write
+
+concurrency:
+  group: veille
+  cancel-in-progress: false
+
+jobs:
+  veille:
+    runs-on: ubuntu-latest
+    timeout-minutes: 90
+    environment:
+      name: github-pages
+      url: ${{ steps.publication.outputs.page_url }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.13"
+          cache: pip
+
+      - name: Dépendances
+        run: pip install -r requirements.txt
+
+      - name: Profil personnel (secret chiffré GitHub, jamais versionné)
+        env:
+          PROFIL: ${{ secrets.PROFIL_MARCELLIN }}
+        run: |
+          test -n "$PROFIL" || { echo "Secret PROFIL_MARCELLIN manquant"; exit 1; }
+          printf '%s\n' "$PROFIL" > profils/marcellin.yaml
+
+      - name: Base des offres (reprise du passage précédent)
+        uses: actions/cache/restore@v4
+        with:
+          path: donnees
+          key: veille-base-${{ github.run_id }}
+          restore-keys: veille-base-
+
+      - name: Contrôles de fiabilité, conformité et sécurité
+        run: python -m unittest discover -s tests -v
+
+      - name: Collecte, notation et dossiers de candidature
+        env:
+          VEILLE_PHRASE: ${{ secrets.VEILLE_PHRASE }}
+        run: python veille.py
+
+      - name: Sauvegarde de la base
+        if: always()
+        uses: actions/cache/save@v4
+        with:
+          path: donnees
+          key: veille-base-${{ github.run_id }}
+
+      - name: Contrôle avant publication (aucune donnée en clair)
+        run: python tests/verifier_publication.py site profils/marcellin.yaml
+
+      - uses: actions/configure-pages@v5
+      - uses: actions/upload-pages-artifact@v3
+        with:
+          path: site
+      - id: publication
+        uses: actions/deploy-pages@v4
